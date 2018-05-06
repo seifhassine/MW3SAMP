@@ -2310,7 +2310,7 @@ new AirPick,AirCPick,AirON,Air2Pick,Air2ON, FlashON, AirSecs, Air2Secs, FlashSec
 native WP_Hash(buffer[], len, const str[]);
 
 new Text:Announce;
-#define VERSION "7.7.3"
+#define VERSION "7.7.4"
 #define WEBSITE "www.mw3-samp.org"
 #define CAREPACKRESPAWN 120000
 
@@ -6459,7 +6459,7 @@ public OnGameModeInit()
 	TextDrawSetProportional(onconnect[6], 1);
 	TextDrawSetShadow(onconnect[6], 1);
 
-	onconnect[7] = TextDrawCreate(341.000000, 252.416671, "v7.7.3");
+	onconnect[7] = TextDrawCreate(341.000000, 252.416671, "v7.7.4");
 	TextDrawLetterSize(onconnect[7], 0.166500, 0.964164);
 	TextDrawAlignment(onconnect[7], 1);
 	TextDrawColor(onconnect[7], -1);
@@ -6726,7 +6726,7 @@ public OnGameModeInit()
 	TextDrawSetPreviewRot(TDEditor_PTD[16], 0.000000, 20.000000, 0.000000, 1.000000);
 	TextDrawSetPreviewVehCol(TDEditor_PTD[16], 1, 1);
 
-	TDEditor_PTD[17] = TextDrawCreate(406.500000, 386.583343, "Server version : v 7.7.3");
+	TDEditor_PTD[17] = TextDrawCreate(406.500000, 386.583343, "Server version : v 7.7.4");
 	TextDrawLetterSize(TDEditor_PTD[17], 0.207000, 0.894164);
 	TextDrawAlignment(TDEditor_PTD[17], 1);
 	TextDrawColor(TDEditor_PTD[17], -1);
@@ -6836,7 +6836,7 @@ public OnGameModeInit()
 	TextDrawSetProportional(WC[3], 1);
 	TextDrawSetShadow(WC[3], 0);
 
-	WC[4] = TextDrawCreate(279.500000, 213.846527, "version_7.7.3");
+	WC[4] = TextDrawCreate(279.500000, 213.846527, "version_7.7.4");
 	TextDrawLetterSize(WC[4], 0.400000, 1.600000);
 	TextDrawAlignment(WC[4], 1);
 	TextDrawColor(WC[4], -16776996);
@@ -6920,7 +6920,7 @@ public OnGameModeInit()
 	TextDrawSetShadow(Revoked_License[1], 0);
 
 	format(ServerInfo[MOTD],80,"Server has been updated. Check /updates.");
-	SetGameModeText("COD-MW3 v7.7.3 TDM|DM|WAR|PUBG");
+	SetGameModeText("COD-MW3 v7.7.4 TDM|DM|WAR|PUBG");
 	EnableStuntBonusForAll(0);
 
 	SetTimer("RandomMessage", 120000, 1);
@@ -7635,6 +7635,7 @@ CMD:mdm(playerid, params[])
 
 CMD:dm(playerid, params[])
 {
+	if(!PlayerInfo[playerid][IsSpawned]) return ERR(playerid,"You have to be spawned to use this cmd");
 	if(HasJoined(playerid)) return ERR(playerid,"You can't change your class while in a clan war");
 	if(!CheckNearBy(playerid)) return SCM(playerid,Dred,"* Enemey Nearby You cant use this command now");
 	new Float:HP;
@@ -7666,6 +7667,7 @@ CMD:dm(playerid, params[])
 
 CMD:sdm(playerid, params[])
 {
+	if(!PlayerInfo[playerid][IsSpawned]) return ERR(playerid,"You have to be spawned to use this cmd");
 	if(PlayerInfo[playerid][JailTime] > 0) return ERR(playerid, "Cannot use this cmd while in jail.");
 	if(PlayerInfo[playerid][JailTime] > 0) return ERR(playerid, "Cannot use this cmd while in jail.");
 	if(HasJoined(playerid)) return ERR(playerid,"You can't change your class while in a clan war");
@@ -7698,6 +7700,7 @@ CMD:sdm(playerid, params[])
 
 CMD:chdm(playerid, params[])
 {
+	if(!PlayerInfo[playerid][IsSpawned]) return ERR(playerid,"You have to be spawned to use this cmd");
 	if(PlayerInfo[playerid][JailTime] > 0) return ERR(playerid, "Cannot use this cmd while in jail.");
 	if(HasJoined(playerid)) return ERR(playerid,"You can't change your class while in a clan war");
 	if(!CheckNearBy(playerid)) return SCM(playerid,Dred,"* Enemey Nearby You cant use this command now");
@@ -7726,6 +7729,7 @@ CMD:chdm(playerid, params[])
 
 CMD:cbdm(playerid, params[])
 {
+	if(!PlayerInfo[playerid][IsSpawned]) return ERR(playerid,"You have to be spawned to use this cmd");
 	if(PlayerInfo[playerid][JailTime] > 0) return ERR(playerid, "Cannot use this cmd while in jail.");
 	if(HasJoined(playerid)) return ERR(playerid,"You can't change your class while in a clan war");
 	if(!CheckNearBy(playerid)) return SCM(playerid,Dred,"* Enemey Nearby You cant use this command now");
@@ -7758,6 +7762,7 @@ CMD:cbdm(playerid, params[])
 
 CMD:hsdm(playerid, params[])
 {
+	if(!PlayerInfo[playerid][IsSpawned]) return ERR(playerid,"You have to be spawned to use this cmd");
 	if(PlayerInfo[playerid][JailTime] > 0) return ERR(playerid, "Cannot use this cmd while in jail.");
 	if(HasJoined(playerid)) return ERR(playerid,"You can't change your class while in a clan war");
 	if(!CheckNearBy(playerid)) return SCM(playerid,Dred,"* Enemey Nearby You cant use this command now");
@@ -8738,7 +8743,6 @@ public LoadEventLootCoords()
 		strcat(tag, "\n\nF to pickup");
 		PUBGLootObj[i][ObjType] = type;
 	    PUBGLootObj[i][ObjID] = CreateDynamicObject(type,xx,yy,zz,0,0,0, 500, 0);
-	    format(tag, sizeof tag, "%0.3f\n%0.3f\n%0.3f", xx,yy,zz);
         PUBGLootObj[i][ObjIDLabel] = CreateDynamic3DTextLabel(tag, 0xFFFF00AA, xx, yy, zz-0.1, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, 500, 0,-1, 20.0 );
 	}
 	return 1;
@@ -30188,15 +30192,12 @@ CMD:sc(playerid, params[])
 	return 1;
 }
 
-
 stock GetOnLineClanMembers(clan)
 {
 	new count;
 	foreach(new i : Player) if(PlayerInfo[i][InClan] == clan) count ++;
 	return count;
 }
-
-
 
 stock clanin(playerid)
 {
@@ -34009,12 +34010,13 @@ CMD:updates(playerid, params[])
 	new Cat[3500];
 	strcat(Cat,"{FF8080}\nAdded: The Clan Tournament System back (Tested - Flawless).");
 	strcat(Cat,"{FF8080}\nFixed: /st & /sc problems.");
+	strcat(Cat,"{FF8080}\nFixed: DM cmds could be used in class selection.");
 	if(PlayerInfo[playerid][Level] > 0)
 	{
  		strcat(Cat,"\n\n{0000FF}Admin Notes:");
  		strcat(Cat,"\nAdded: /forcerules cmd for 2+.");
 	}
-	ShowPlayerDialogEx(playerid,2333,DIALOG_STYLE_MSGBOX,"Version 7.7.3 Changelog",Cat,"OK","");
+	ShowPlayerDialogEx(playerid,2333,DIALOG_STYLE_MSGBOX,"Version 7.7.4 Changelog",Cat,"OK","");
 	return 1;
 }
 
