@@ -2040,7 +2040,7 @@ new AdminCMD[][levelp] = {
 	{
 		2,"bike","spawn a bike"},{2,"acar","spawn a car"},{2,"ban"," ban a player"},{2,"searchban","search for banned player"},{2,"unbanip",""},{2,"unban","unban a player"},{2,"undo","undo one of your 5 previous bans"},{2,"disarm","remove player weapons"},{2,"spawn",""},
 	{
-		2,"burn","burn a player"},{2,"unlockcar",""},{2,"lockcar",""},{2,"tban",""},{2,"move","move a player to another player"},
+		2,"burn","burn a player"},{2,"unlockcar",""},{2,"lockcar",""}, {2,"forcerules","show a player rules list"},{2,"tban",""},{2,"move","move a player to another player"},
 	// LEVEL 3
 
 	{
@@ -29772,23 +29772,51 @@ stock CheckNearBy(playerid)
 
 CMD:rules(playerid, params[])
 {
-
-	SendClientMessage(playerid, COLOR_PURPLE, " ---= Call Of Duty - Modern Warfare 3 Rules =---");
-	SendClientMessage(playerid, red, "1).Do not use any kind of bugs that gives you advantage over others players.");
-	SendClientMessage(playerid, red, "2).Do not cheat or hack as it wont get you anywhere.");
-	SendClientMessage(playerid, red, "3).Do not insult other players nor do not spam/flood the chat.");
-	SendClientMessage(playerid, red, "4).Please do respect everyone (Players&Administrators).");
-	SendClientMessage(playerid, red, "5).Do not score farm as it's considered as exploiting.");
-	SendClientMessage(playerid, red, "6).Do not car park players.");
-	SendClientMessage(playerid, red, "7).Do not spawnkill.");
-	SendClientMessage(playerid, red, "8).Do not ask for things from Administrators, earn them legitly.");
-	SendClientMessage(playerid, red, "9).Baseraid is not allowed ( attacking bases with heavy vehicles )");
-	SendClientMessage(playerid, red, "10).C-Bug Only allowed in dm arenas (  dm, cbdm, sdm )");
-	SendClientMessage(playerid, red, "11).Placing mines & /pb at capture point not allowed");
-	SendClientMessage(playerid, red, "12).Crackshooting is not allowed");
-	SendClientMessage(playerid, red, "13).Abusing clan toys is not allowed");
+	new cat[1200];
+	strcat(cat, "\t{FFFF00}---= Call Of Duty - Modern Warfare 3 Rules =---\n\n");
+	strcat(cat, "{E10000}1).Do not use any kind of bugs that gives you advantage over others players.");
+	strcat(cat, "\n2).Do not cheat or hack as it wont get you anywhere.");
+	strcat(cat, "\n3).Do not insult other players nor do not spam/flood the chat.");
+	strcat(cat, "\n4).Please do respect everyone (Players&Administrators).");
+	strcat(cat, "\n5).Do not score farm as it's considered as exploiting.");
+	strcat(cat, "\n6).Do not car park players.");
+	strcat(cat, "\n7).Do not spawnkill.");
+	strcat(cat, "\n8).Do not ask for things from Administrators, earn them legitly.");
+	strcat(cat, "\n9).Baseraid is not allowed ( attacking bases with heavy vehicles )");
+	strcat(cat, "\n10).C-Bug Only allowed in dm arenas (  dm, cbdm, sdm )");
+	strcat(cat, "\n11).Placing mines & /pb at capture point not allowed");
+	strcat(cat, "\n12).Crackshooting is not allowed");
+	strcat(cat, "\n13).Abusing clan toys is not allowed");
+	ShowPlayerDialogEx(playerid, 5137, DIALOG_STYLE_MSGBOX,"{DE0000}MW3 Rules", cat, "Close", "");
 	return 1;
 }
+CMD:forcerules(playerid, params[])
+{
+	if(PlayerInfo[playerid][Level] < 2) return ERR(playerid, "You have to be at least admin level 2 to use this cmd.");
+	new id;
+	if(sscanf(params,"dd",id)) return USG(playerid,"/forcerules (playerid)");
+	if(!IsPlayerConnected(id)) return ERR(playerid, "Player not connected");
+	if(PlayerInfo[id][Level] > 0) return ERR(playerid, "Cannot use this cmd on admins.");
+	new cat[1200];
+	strcat(cat, "\t{FFFF00}---= Call Of Duty - Modern Warfare 3 Rules =---\n\n");
+	strcat(cat, "{E10000}1).Do not use any kind of bugs that gives you advantage over others players.");
+	strcat(cat, "\n2).Do not cheat or hack as it wont get you anywhere.");
+	strcat(cat, "\n3).Do not insult other players nor do not spam/flood the chat.");
+	strcat(cat, "\n4).Please do respect everyone (Players&Administrators).");
+	strcat(cat, "\n5).Do not score farm as it's considered as exploiting.");
+	strcat(cat, "\n6).Do not car park players.");
+	strcat(cat, "\n7).Do not spawnkill.");
+	strcat(cat, "\n8).Do not ask for things from Administrators, earn them legitly.");
+	strcat(cat, "\n9).Baseraid is not allowed ( attacking bases with heavy vehicles )");
+	strcat(cat, "\n10).C-Bug Only allowed in dm arenas (  dm, cbdm, sdm )");
+	strcat(cat, "\n11).Placing mines & /pb at capture point not allowed");
+	strcat(cat, "\n12).Crackshooting is not allowed");
+	strcat(cat, "\n13).Abusing clan toys is not allowed");
+	CMDMessageToAdmins(playerid,"FORCERULES");
+	ShowPlayerDialogEx(id, 5137, DIALOG_STYLE_MSGBOX,"{DE0000}MW3 Rules", cat, "Close", "");
+	return 1;
+}
+
 CMD:cbhelp(playerid, params[])
 {
 	SendClientMessage(playerid, COLOR_PURPLE, " ---= Clan Base MW3 Help =--");
@@ -33984,6 +34012,7 @@ CMD:updates(playerid, params[])
 	if(PlayerInfo[playerid][Level] > 0)
 	{
  		strcat(Cat,"\n\n{0000FF}Admin Notes:");
+ 		strcat(Cat,"\nAdded: /forcerules cmd for 2+.");
 	}
 	ShowPlayerDialogEx(playerid,2333,DIALOG_STYLE_MSGBOX,"Version 7.7.3 Changelog",Cat,"OK","");
 	return 1;
