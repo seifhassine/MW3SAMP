@@ -669,6 +669,8 @@ new Text:CTSpectatorTwitch;
 new Text:CTSpectatorIg;
 new Text:Warmup0,Text:Warmup1,Text:Warmup2;
 new Text:WC[7],Text:CW[13],Text:onconnect[11], Text:TDEditor_PTD[22];
+new Text:MVP_BoxTitle, Text:MVP_Box2, Text:MVP_Picture, Text:MVP_Description;
+
 new Text:SpecPanel_TD[23];
 new Text:AdminCMD_TD[4];
 new AdminCMD_STR[4][128];
@@ -2010,6 +2012,11 @@ new WAR_SLOT_DEFAULT[10] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 new WAR_SLOT_T1_AID[10] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 new WAR_SLOT_T2_AID[10] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
+new CW_DAMAGE[MAX_PLAYERS];
+new CW_KILLS[MAX_PLAYERS];
+new CW_R_DAMAGE[MAX_PLAYERS];
+new CW_R_KILLS[MAX_PLAYERS];
+
 new Iterator:JOINED1<MAX_PLAYERS>;
 new Iterator:JOINED2<MAX_PLAYERS>;
 new Iterator:ALIVE1<MAX_PLAYERS>;
@@ -2926,6 +2933,55 @@ public OnGameModeInit()
     SendRconCommand("language Call of Duty [ORIGINAL] EN/BR/ES");
 	//
 
+	///CW MVPS TDS
+	MVP_BoxTitle = TextDrawCreate(316.000000, 140.000000, "DS win the round~n~~n~~n~");
+	TextDrawAlignment(MVP_BoxTitle, 2);
+	TextDrawBackgroundColor(MVP_BoxTitle, 15410);
+	TextDrawFont(MVP_BoxTitle, 1);
+	TextDrawLetterSize(MVP_BoxTitle, 0.389999, 1.499999);
+	TextDrawColor(MVP_BoxTitle, -1);
+	TextDrawSetOutline(MVP_BoxTitle, 1);
+	TextDrawSetProportional(MVP_BoxTitle, 1);
+	TextDrawUseBox(MVP_BoxTitle, 1);
+	TextDrawBoxColor(MVP_BoxTitle, 15410);
+	TextDrawTextSize(MVP_BoxTitle, 442.000000, 228.000000);
+
+	MVP_Box2 = TextDrawCreate(202.000000, 158.000000, "_");
+	TextDrawBackgroundColor(MVP_Box2, 255);
+	TextDrawFont(MVP_Box2, 1);
+	TextDrawLetterSize(MVP_Box2, 0.500000, 2.500000);
+	TextDrawColor(MVP_Box2, -1);
+	TextDrawSetOutline(MVP_Box2, 0);
+	TextDrawSetProportional(MVP_Box2, 1);
+	TextDrawSetShadow(MVP_Box2, 1);
+	TextDrawUseBox(MVP_Box2, 1);
+	TextDrawBoxColor(MVP_Box2, 2690);
+	TextDrawTextSize(MVP_Box2, 430.000000, 0.000000);
+
+	MVP_Picture = TextDrawCreate(201.000000, 158.000000, "mvp logo");
+	TextDrawBackgroundColor(MVP_Picture, 0);
+	TextDrawFont(MVP_Picture, 5);
+	TextDrawLetterSize(MVP_Picture, 0.500000, 1.000000);
+	TextDrawColor(MVP_Picture, -1);
+	TextDrawSetOutline(MVP_Picture, 0);
+	TextDrawSetProportional(MVP_Picture, 1);
+	TextDrawSetShadow(MVP_Picture, 1);
+	TextDrawUseBox(MVP_Picture, 1);
+	TextDrawBoxColor(MVP_Picture, 0);
+	TextDrawTextSize(MVP_Picture, 28.000000, 25.000000);
+	TextDrawSetPreviewModel(MVP_Picture, 2050);
+	TextDrawSetPreviewRot(MVP_Picture, 0.000000, 0.000000, 0.000000, 1.000000);
+
+	MVP_Description = TextDrawCreate(228.000000, 166.000000, "~y~] ~w~MVP: Seif_Escobar for most eliminations.");
+	TextDrawBackgroundColor(MVP_Description, 255);
+	TextDrawFont(MVP_Description, 2);
+	TextDrawLetterSize(MVP_Description, 0.180000, 1.000000);
+	TextDrawColor(MVP_Description, -1);
+	TextDrawSetOutline(MVP_Description, 0);
+	TextDrawSetProportional(MVP_Description, 1);
+	TextDrawSetShadow(MVP_Description, 1);
+
+	//
     CR_MG = TextDrawCreate(276.000000, 248.000000, "MG");
 	TextDrawBackgroundColor(CR_MG, 0);
 	TextDrawFont(CR_MG, 5);
@@ -7496,6 +7552,69 @@ stock HasJoined(playerid)
 	return isthere;
 }
 
+stock ShowMVP(playerid)
+{
+    TextDrawShowForPlayer(playerid, MVP_BoxTitle);
+    TextDrawShowForPlayer(playerid, MVP_Box2);
+    TextDrawShowForPlayer(playerid, MVP_Picture);
+    TextDrawShowForPlayer(playerid, MVP_Description);
+    return 1;
+}
+
+stock HideMVP(playerid)
+{
+    TextDrawHideForPlayer(playerid, MVP_BoxTitle);
+    TextDrawHideForPlayer(playerid, MVP_Box2);
+    TextDrawHideForPlayer(playerid, MVP_Picture);
+    TextDrawHideForPlayer(playerid, MVP_Description);
+    return 1;
+}
+
+stock CheckMVP(winner)
+{
+    new maxx = CLAN_WAR[CW_MAX];
+    new maxdmg, maxkills, maxdmger, maxkillser;
+    maxdmg = maxkills = -1;
+    if(winner == 1)
+	{
+		for(new i=0; i < maxx; i++)
+		{
+		    new player = WAR_SLOT_T1[i];
+		    if(!IsPlayerConnected(player)) continue;
+		    if(CW_R_DAMAGE[player] > maxdmg) { maxdmg = CW_R_DAMAGE[player]; maxdmger = player; }
+		    if(CW_R_KILLS[player] > maxkills) { maxkills = CW_R_KILLS[player]; maxkillser = player; }
+			TextDrawSetPreviewModel(MVP_Picture, 2050);
+		}
+	}
+	else
+	{
+		for(new i=0; i < maxx; i++)
+		{
+		    new player = WAR_SLOT_T2[i];
+		    if(!IsPlayerConnected(player)) continue;
+		    if(CW_R_DAMAGE[player] > maxdmg) { maxdmg = CW_R_DAMAGE[player]; maxdmger = player; }
+		    if(CW_R_KILLS[player] > maxkills) { maxkills = CW_R_KILLS[player]; maxkillser = player; }
+			TextDrawSetPreviewModel(MVP_Picture, 2049);
+		}
+	}
+	new str[80];
+	if((maxx - maxkills) < 2)
+	{
+ 	    format(str, sizeof str, "%s win the round~n~~n~~n~", cTag[maxkillser]);
+ 	    TextDrawSetString(MVP_BoxTitle, str);
+		format(str, sizeof str, "~y~] ~w~MVP: %s for most eliminations. (%d)", PlayerInfo[maxkillser][Nick], maxkills);
+		TextDrawSetString(MVP_Description, str);
+	}
+	else
+	{
+ 	    format(str, sizeof str, "%s win the round~n~~n~~n~", cTag[maxdmger]);
+ 	    TextDrawSetString(MVP_BoxTitle, str);
+		format(str, sizeof str, "~y~] ~w~MVP: %s for most eliminations. (%d)", PlayerInfo[maxdmger][Nick], maxdmg);
+		TextDrawSetString(MVP_Description, str);
+	}
+	return 1;
+}
+
 stock HasJoined1(playerid)
 {
 	new isthere;
@@ -11183,6 +11302,8 @@ public OnPlayerDisconnect(playerid, reason)
 		HideViewersTD(playerid);
 		if(HasJoined(playerid))
 		{
+		    if(!CLAN_WAR[CW_STARTED]) goto there;
+		    CW_R_KILLS[playerid] = CW_KILLS[playerid] = CW_DAMAGE[playerid] = CW_R_DAMAGE[playerid] = 0;
 		    new maxx = CLAN_WAR[CW_MAX];
 		    for(new i=0; i < maxx; i++)
 			{
@@ -11342,6 +11463,7 @@ public OnPlayerDisconnect(playerid, reason)
 					            }
 								TextDrawHideForPlayer(x, CW_ROUNDS);
 								HideViewersTD(x);
+								HideMVP(x);
 						    }
 						}
 						new win, los;
@@ -11363,7 +11485,9 @@ public OnPlayerDisconnect(playerid, reason)
 								HideProgressBarForPlayer(x, CW_STAT_BAR_2[ARMOURR][i]);
 							}
 							HideViewersTD(x);
+							HideMVP(x);
 							TextDrawHideForPlayer(x, CW_ROUNDS);
+							CW_R_KILLS[x] = CW_KILLS[x] = CW_R_DAMAGE[x] = CW_DAMAGE[x] = 0;
 						}
 						foreach(new x: JOINED2)
 						{
@@ -11382,7 +11506,9 @@ public OnPlayerDisconnect(playerid, reason)
 							}
 							TextDrawHideForPlayer(x, CW_ROUNDS);
 							HideViewersTD(x);
+							HideMVP(x);
 							PlayerPlaySound(x, 36204, 0.0, 0.0, 0.0);
+							CW_R_KILLS[x] = CW_KILLS[x] = CW_R_DAMAGE[x] = CW_DAMAGE[x] = 0;
 						}
 						foreach(new x: ALIVE2) SpawnPlayer(x);
 						for(new i=0; i < maxx; i++) WAR_SLOT_T1[i] = WAR_SLOT_T2[i] = WAR_SLOT_T1_AID[i] = WAR_SLOT_T2_AID[i] = -1;
@@ -11533,6 +11659,7 @@ public OnPlayerDisconnect(playerid, reason)
 					            }
 								TextDrawHideForPlayer(x, CW_ROUNDS);
 					            HideViewersTD(x);
+					            HideMVP(x);
 						    }
 						}
 						foreach(new x: JOINED1)
@@ -11550,7 +11677,9 @@ public OnPlayerDisconnect(playerid, reason)
 								HideProgressBarForPlayer(x, CW_STAT_BAR_2[ARMOURR][i]);
 							}
 							HideViewersTD(x);
+							HideMVP(x);
 							TextDrawHideForPlayer(x, CW_ROUNDS);
+							CW_R_KILLS[x] = CW_KILLS[x] = CW_R_DAMAGE[x] = CW_DAMAGE[x] = 0;
 							PlayerPlaySound(x, 36204, 0.0, 0.0, 0.0);
 						}
 						foreach(new x: ALIVE1) SpawnPlayer(x);
@@ -11570,6 +11699,8 @@ public OnPlayerDisconnect(playerid, reason)
 								HideProgressBarForPlayer(x, CW_STAT_BAR_2[ARMOURR][i]);
 							}
 							HideViewersTD(x);
+							HideMVP(x);
+							CW_R_KILLS[x] = CW_KILLS[x] = CW_R_DAMAGE[x] = CW_DAMAGE[x] = 0;
 							TextDrawHideForPlayer(x, CW_ROUNDS);
 						}
 						WAR_SLOT_T1 = WAR_SLOT_DEFAULT;
@@ -11921,6 +12052,7 @@ public OnPlayerDisconnect(playerid, reason)
 							            }
 							            TextDrawHideForPlayer(x, CW_ROUNDS);
 							            HideViewersTD(x);
+							            HideMVP(x);
 								    }
 								}
 								foreach(new x: JOINED1)
@@ -11939,7 +12071,9 @@ public OnPlayerDisconnect(playerid, reason)
 										HideProgressBarForPlayer(x, CW_STAT_BAR_2[ARMOURR][i]);
 									}
 									HideViewersTD(x);
+									HideMVP(x);
 									TextDrawHideForPlayer(x, CW_ROUNDS);
+									CW_R_KILLS[x] = CW_KILLS[x] = CW_R_DAMAGE[x] = CW_DAMAGE[x] = 0;
 								}
 								foreach(new x: JOINED2)
 								{
@@ -11957,7 +12091,9 @@ public OnPlayerDisconnect(playerid, reason)
 										HideProgressBarForPlayer(x, CW_STAT_BAR_2[ARMOURR][i]);
 									}
 									HideViewersTD(x);
+									HideMVP(x);
 									TextDrawHideForPlayer(x, CW_ROUNDS);
+									CW_R_KILLS[x] = CW_KILLS[x] = CW_R_DAMAGE[x] = CW_DAMAGE[x] = 0;
 								}
 								WAR_SLOT_T1 = WAR_SLOT_DEFAULT;
 								WAR_SLOT_T2 = WAR_SLOT_DEFAULT;
@@ -11971,27 +12107,25 @@ public OnPlayerDisconnect(playerid, reason)
 							}
 							else
 							{
-
 								new tag1[7], tag2[7];
 								foreach(new z : JOINED1)
 								{
-
 									tag1 = cTag[z];
 									format(tag1, sizeof tag1, "%s", cTag[z]);
 									break;
 								}
 								foreach(new z : JOINED2)
 								{
-
 									format(tag2, sizeof tag2, "%s", cTag[z]);
 									break;
 								}
+								CheckMVP(2);
 								CWTimer5 = SetTimer("StartCW2", 10000, 0);
 								format(str, sizeof str,"    Round: ~p~%d~w~/~g~%d~n~~b~~h~%s~w~: %d    ~r~~h~%s~w~: %d", CLAN_WAR[CW_ROUND1] + CLAN_WAR[CW_ROUND2] + 1, CLAN_WAR[CW_ROUNDSS], tag2, CLAN_WAR[CW_ROUND2], tag1, CLAN_WAR[CW_ROUND1]);
 								TextDrawSetString(CW_ROUNDS, str);
-								foreach(new c : JOINED1) TextDrawShowForPlayer(c, CW_ROUNDS);
-								foreach(new c : JOINED2) TextDrawShowForPlayer(c, CW_ROUNDS);
-								foreach(new c : Player) if(IsSpectator[c]) TextDrawShowForPlayer(c, CW_ROUNDS);
+								foreach(new c : JOINED1) { TextDrawShowForPlayer(c, CW_ROUNDS); CW_R_KILLS[c] = CW_R_DAMAGE[c] = 0; ShowMVP(c);}
+								foreach(new c : JOINED2) { TextDrawShowForPlayer(c, CW_ROUNDS); CW_R_KILLS[c] = CW_R_DAMAGE[c] = 0; ShowMVP(c);}
+								foreach(new c : Player) if(IsSpectator[c]) { TextDrawShowForPlayer(c, CW_ROUNDS); ShowMVP(c);}
 								for(new i=0; i < maxx; i++)
 								{
 									if(IsPlayerConnected(WAR_SLOT_T1[i]))
@@ -12365,6 +12499,7 @@ public OnPlayerDisconnect(playerid, reason)
 							            }
 							            TextDrawHideForPlayer(x, CW_ROUNDS);
 							            HideViewersTD(x);
+							            HideMVP(x);
 								    }
 								}
 								foreach(new x: JOINED1)
@@ -12384,6 +12519,8 @@ public OnPlayerDisconnect(playerid, reason)
 									}
 									TextDrawHideForPlayer(x, CW_ROUNDS);
 									HideViewersTD(x);
+									HideMVP(x);
+									CW_R_KILLS[x] = CW_KILLS[x] = CW_R_DAMAGE[x] = CW_DAMAGE[x] = 0;
 								}
 								foreach(new x: JOINED2)
 								{
@@ -12402,6 +12539,8 @@ public OnPlayerDisconnect(playerid, reason)
 									}
 									TextDrawHideForPlayer(x, CW_ROUNDS);
 									HideViewersTD(x);
+									HideMVP(x);
+									CW_R_KILLS[x] = CW_KILLS[x] = CW_R_DAMAGE[x] = CW_DAMAGE[x] = 0;
 								}
 								WAR_SLOT_T1 = WAR_SLOT_DEFAULT;
 								WAR_SLOT_T2 = WAR_SLOT_DEFAULT;
@@ -12431,10 +12570,11 @@ public OnPlayerDisconnect(playerid, reason)
 									break;
 								}
 								CWTimer5 = SetTimer("StartCW2", 10000, 0);
+								CheckMVP(1);
 								format(str, sizeof str,"    Round: ~p~%d~w~/~g~%d~n~~b~~h~%s~w~: %d    ~r~~h~%s~w~: %d", CLAN_WAR[CW_ROUND1] + CLAN_WAR[CW_ROUND2] + 1, CLAN_WAR[CW_ROUNDSS], tag2, CLAN_WAR[CW_ROUND2], tag1, CLAN_WAR[CW_ROUND1]);
 								TextDrawSetString(CW_ROUNDS, str);
-								foreach(new c : JOINED1) TextDrawShowForPlayer(c, CW_ROUNDS);
-								foreach(new c : JOINED2) TextDrawShowForPlayer(c, CW_ROUNDS);
+								foreach(new c : JOINED1) { TextDrawShowForPlayer(c, CW_ROUNDS); CW_R_KILLS[c] = CW_R_DAMAGE[c] = 0; ShowMVP(c);}
+								foreach(new c : JOINED2) { TextDrawShowForPlayer(c, CW_ROUNDS); CW_R_KILLS[c] = CW_R_DAMAGE[c] = 0; ShowMVP(c);}
 								for(new i=0; i < maxx; i++)
 								{
 
@@ -12517,6 +12657,7 @@ public OnPlayerDisconnect(playerid, reason)
 								{
 								    if(IsSpectator[w])
 								    {
+								        ShowMVP(w);
 							        	foreach(new i : ALIVE1)
 										{
 											SpectatedPlayer2[w] = i;
@@ -12538,6 +12679,7 @@ public OnPlayerDisconnect(playerid, reason)
 			}
 		}
 	}
+	there: {}
 	if(playerid == airvehdriver) FailAirstrikeDis(playerid);
     if(GetPVarInt(playerid,"roped") == 1) for(new destr=0;destr<ropelength;destr++) { DestroyDynamicObject(r0pes[playerid][destr]); r0pes[playerid][destr] = -1; }
 	Bit_Set(isdspec, playerid, false);
@@ -13901,7 +14043,7 @@ public ClanWarRoundSpawn(w, t)
 	GivePlayerWeapon(w,31,250);
 	SetPlayerHealth(w,100);
 	SetPlayerArmour(w,100);
-	GameTextForPlayer(w, "~p~Loading..", 3000, 3);
+	GameTextForPlayer(w, "~n~~n~~p~Loading..", 3000, 3);
 	foreach(new i : Player)
 	{
 	    if(IsSpectator[i])
@@ -14086,11 +14228,9 @@ public OnPlayerDeath(playerid, killerid, reason)
 	}
 	if(GetTickCount() - FakekillData[playerid][LastDeathTime] < FAKEKILL_DELAY)
 	{
-
 		FakekillData[playerid][DeathCount]++;
 		if(FakekillData[playerid][DeathCount] == FAKEKILL_LIMIT)
 		{
-
 			format(msg,sizeof(msg),"Anticheat:: %s has been kicked for ( Fake Kills )",playername);
 			MessageToTwice(grey,msg);
 			Kick(playerid);
@@ -14462,6 +14602,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					            }
 					            TextDrawHideForPlayer(x, CW_ROUNDS);
 					            HideViewersTD(x);
+					            HideMVP(x);
 						    }
 						}
 						foreach(new x: JOINED1)
@@ -14480,6 +14621,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 							}
 							TextDrawHideForPlayer(x, CW_ROUNDS);
 							HideViewersTD(x);
+							HideMVP(x);
+							CW_R_KILLS[x] = CW_KILLS[x] = CW_R_DAMAGE[x] = CW_DAMAGE[x] = 0;
 						}
 						foreach(new x: JOINED2)
 						{
@@ -14498,6 +14641,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 							}
 							TextDrawHideForPlayer(x, CW_ROUNDS);
 							HideViewersTD(x);
+							HideMVP(x);
+							CW_R_KILLS[x] = CW_KILLS[x] = CW_R_DAMAGE[x] = CW_DAMAGE[x] = 0;
 						}
 						WAR_SLOT_T1 = WAR_SLOT_DEFAULT;
 						WAR_SLOT_T2 = WAR_SLOT_DEFAULT;
@@ -14517,10 +14662,11 @@ public OnPlayerDeath(playerid, killerid, reason)
 							break;
 						}
 						CWTimer5 = SetTimer("StartCW2", 10000, 0);
+						CheckMVP(2);
 						format(str, sizeof str,"    Round: ~p~%d~w~/~g~%d~n~~b~~h~%s~w~: %d    ~r~~h~%s~w~: %d", CLAN_WAR[CW_ROUND1] + CLAN_WAR[CW_ROUND2] + 1, CLAN_WAR[CW_ROUNDSS], tag2, CLAN_WAR[CW_ROUND2], tag1, CLAN_WAR[CW_ROUND1]);
 						TextDrawSetString(CW_ROUNDS, str);
-						foreach(new c : JOINED1) TextDrawShowForPlayer(c, CW_ROUNDS);
-						foreach(new c : JOINED2) TextDrawShowForPlayer(c, CW_ROUNDS);
+						foreach(new c : JOINED1) { TextDrawShowForPlayer(c, CW_ROUNDS); CW_R_KILLS[c] = CW_R_DAMAGE[c] = 0; ShowMVP(c);}
+						foreach(new c : JOINED2) { TextDrawShowForPlayer(c, CW_ROUNDS); CW_R_KILLS[c] = CW_R_DAMAGE[c] = 0; ShowMVP(c);}
 						for(new i=0; i < maxx; i++)
 						{
 							if(IsPlayerConnected(WAR_SLOT_T1[i]))
@@ -14593,6 +14739,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 						{
 						    if(IsSpectator[w])
 						    {
+						        ShowMVP(w);
 					        	foreach(new i : ALIVE1)
 								{
 									SpectatedPlayer2[w] = i;
@@ -14885,6 +15032,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					            }
 					            TextDrawHideForPlayer(x, CW_ROUNDS);
 					            HideViewersTD(x);
+					            HideMVP(x);
 						    }
 						}
 						foreach(new x: JOINED1)
@@ -14903,7 +15051,9 @@ public OnPlayerDeath(playerid, killerid, reason)
 								HideProgressBarForPlayer(x, CW_STAT_BAR_2[ARMOURR][i]);
 							}
 							HideViewersTD(x);
+							HideMVP(x);
 							TextDrawHideForPlayer(x, CW_ROUNDS);
+							CW_R_KILLS[x] = CW_KILLS[x] = CW_R_DAMAGE[x] = CW_DAMAGE[x] = 0;
 						}
 						foreach(new x: JOINED2)
 						{
@@ -14921,7 +15071,9 @@ public OnPlayerDeath(playerid, killerid, reason)
 								HideProgressBarForPlayer(x, CW_STAT_BAR_2[ARMOURR][i]);
 							}
 							HideViewersTD(x);
+							HideMVP(x);
 							TextDrawHideForPlayer(x, CW_ROUNDS);
+							CW_R_KILLS[x] = CW_KILLS[x] = CW_R_DAMAGE[x] = CW_DAMAGE[x] = 0;
 						}
 						WAR_SLOT_T1 = WAR_SLOT_DEFAULT;
 						WAR_SLOT_T2 = WAR_SLOT_DEFAULT;
@@ -14946,10 +15098,11 @@ public OnPlayerDeath(playerid, killerid, reason)
 							break;
 						}
 						CWTimer5 = SetTimer("StartCW2", 10000, 0);
+						CheckMVP(1);
 						format(str, sizeof str,"    Round: ~p~%d~w~/~g~%d~n~~b~~h~%s~w~: %d    ~r~~h~%s~w~: %d", CLAN_WAR[CW_ROUND1] + CLAN_WAR[CW_ROUND2] + 1, CLAN_WAR[CW_ROUNDSS], tag2, CLAN_WAR[CW_ROUND2], tag1, CLAN_WAR[CW_ROUND1]);
 						TextDrawSetString(CW_ROUNDS, str);
-						foreach(new c : JOINED1) TextDrawShowForPlayer(c, CW_ROUNDS);
-						foreach(new c : JOINED2) TextDrawShowForPlayer(c, CW_ROUNDS);
+						foreach(new c : JOINED1) { TextDrawShowForPlayer(c, CW_ROUNDS); CW_R_KILLS[c] = CW_R_DAMAGE[c] = 0; ShowMVP(c);}
+						foreach(new c : JOINED2) { TextDrawShowForPlayer(c, CW_ROUNDS); CW_R_KILLS[c] = CW_R_DAMAGE[c] = 0; ShowMVP(c);}
 						for(new i=0; i < maxx; i++)
 						{
 							if(IsPlayerConnected(WAR_SLOT_T1[i]))
@@ -14997,6 +15150,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 							{
 							    if(IsSpectator[j])
 							    {
+							        ShowMVP(j);
 							        if(IsPlayerConnected(WAR_SLOT_T1[i]))
 									{
 										ShowProgressBarForPlayer(j, CW_STAT_BAR[HPP][i]);
@@ -15080,6 +15234,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 				new maxx = CLAN_WAR[CW_MAX];
 				Iter_Remove(ALIVE1, playerid);
 				Iter_Remove(ALIVE2, playerid);
+				CW_KILLS[killerid] ++;
+				CW_R_KILLS[killerid] ++;
 				for(new i=0; i < maxx; i++)
 				{
 
@@ -15406,6 +15562,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					            }
 					            TextDrawHideForPlayer(x, CW_ROUNDS);
 					            HideViewersTD(x);
+					            HideMVP(x);
 						    }
 						}
 						foreach(new x: JOINED1)
@@ -15425,6 +15582,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 							}
 							TextDrawHideForPlayer(x, CW_ROUNDS);
 							HideViewersTD(x);
+							HideMVP(x);
+							CW_R_KILLS[x] = CW_KILLS[x] = CW_R_DAMAGE[x] = CW_DAMAGE[x] = 0;
 						}
 						foreach(new x: JOINED2)
 						{
@@ -15445,6 +15604,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 							}
 							TextDrawHideForPlayer(x, CW_ROUNDS);
 							HideViewersTD(x);
+							HideMVP(x);
+							CW_R_KILLS[x] = CW_KILLS[x] = CW_R_DAMAGE[x] = CW_DAMAGE[x] = 0;
 						}
 						WAR_SLOT_T1 = WAR_SLOT_DEFAULT;
 						WAR_SLOT_T2 = WAR_SLOT_DEFAULT;
@@ -15470,10 +15631,11 @@ public OnPlayerDeath(playerid, killerid, reason)
 							break;
 						}
 						CWTimer5 = SetTimer("StartCW2", 10000, 0);
+						CheckMVP(2);
 						format(str, sizeof str,"    Round: ~p~%d~w~/~g~%d~n~~b~~h~%s~w~: %d    ~r~~h~%s~w~: %d", CLAN_WAR[CW_ROUND1] + CLAN_WAR[CW_ROUND2] + 1, CLAN_WAR[CW_ROUNDSS], tag2, CLAN_WAR[CW_ROUND2], tag1, CLAN_WAR[CW_ROUND1]);
 						TextDrawSetString(CW_ROUNDS, str);
-						foreach(new c : JOINED1) TextDrawShowForPlayer(c, CW_ROUNDS);
-						foreach(new c : JOINED2) TextDrawShowForPlayer(c, CW_ROUNDS);
+						foreach(new c : JOINED1) { TextDrawShowForPlayer(c, CW_ROUNDS); CW_R_KILLS[c] = CW_R_DAMAGE[c] = 0; ShowMVP(c);}
+						foreach(new c : JOINED2) { TextDrawShowForPlayer(c, CW_ROUNDS); CW_R_KILLS[c] = CW_R_DAMAGE[c] = 0; ShowMVP(c);}
 						for(new i=0; i < maxx; i++)
 						{
 							if(IsPlayerConnected(WAR_SLOT_T1[i]))
@@ -15547,6 +15709,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 						{
 						    if(IsSpectator[w])
 						    {
+						        ShowMVP(w);
 					        	foreach(new i : ALIVE1)
 								{
 									SpectatedPlayer2[w] = i;
@@ -15839,6 +16002,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					            }
 					            TextDrawHideForPlayer(x, CW_ROUNDS);
 					            HideViewersTD(x);
+					            HideMVP(x);
 						    }
 						}
 						foreach(new x: JOINED1)
@@ -15859,6 +16023,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 							}
 							TextDrawHideForPlayer(x, CW_ROUNDS);
 							HideViewersTD(x);
+							HideMVP(x);
+							CW_R_KILLS[x] = CW_KILLS[x] = CW_R_DAMAGE[x] = CW_DAMAGE[x] = 0;
 						}
 						foreach(new x: JOINED2)
 						{
@@ -15879,6 +16045,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 							}
 							TextDrawHideForPlayer(x, CW_ROUNDS);
 							HideViewersTD(x);
+							HideMVP(x);
+							CW_R_KILLS[x] = CW_KILLS[x] = CW_R_DAMAGE[x] = CW_DAMAGE[x] = 0;
 						}
 						WAR_SLOT_T1 = WAR_SLOT_DEFAULT;
 						WAR_SLOT_T2 = WAR_SLOT_DEFAULT;
@@ -15905,10 +16073,11 @@ public OnPlayerDeath(playerid, killerid, reason)
 							break;
 						}
 						CWTimer5 = SetTimer("StartCW2", 10000, 0);
+						CheckMVP(1);
 						format(str, sizeof str,"    Round: ~p~%d~w~/~g~%d~n~~b~~h~%s~w~: %d    ~r~~h~%s~w~: %d", CLAN_WAR[CW_ROUND1] + CLAN_WAR[CW_ROUND2] + 1, CLAN_WAR[CW_ROUNDSS], tag2, CLAN_WAR[CW_ROUND2], tag1, CLAN_WAR[CW_ROUND1]);
 						TextDrawSetString(CW_ROUNDS, str);
-						foreach(new c : JOINED1) TextDrawShowForPlayer(c, CW_ROUNDS);
-						foreach(new c : JOINED2) TextDrawShowForPlayer(c, CW_ROUNDS);
+						foreach(new c : JOINED1) { TextDrawShowForPlayer(c, CW_ROUNDS); CW_R_KILLS[c] = CW_R_DAMAGE[c] = 0; ShowMVP(c);}
+						foreach(new c : JOINED2) { TextDrawShowForPlayer(c, CW_ROUNDS); CW_R_KILLS[c] = CW_R_DAMAGE[c] = 0; ShowMVP(c);}
 						for(new i=0; i < maxx; i++)
 						{
 							if(IsPlayerConnected(WAR_SLOT_T1[i]))
@@ -15972,7 +16141,6 @@ public OnPlayerDeath(playerid, killerid, reason)
 						}
 						foreach(new w : JOINED1)
 						{
-
 							IsPlayerSpectating[w] = false;
 							TogglePlayerSpectating(w, 0);
 							Iter_Add(ALIVE1, w);
@@ -15982,6 +16150,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 						{
 						    if(IsSpectator[w])
 						    {
+						        ShowMVP(w);
 					        	foreach(new i : ALIVE1)
 								{
 									SpectatedPlayer2[w] = i;
@@ -15992,7 +16161,6 @@ public OnPlayerDeath(playerid, killerid, reason)
 						}
 						foreach(new w: JOINED2)
 						{
-
 							IsPlayerSpectating[w] = false;
 							TogglePlayerSpectating(w, 0);
 							Iter_Add(ALIVE2, w);
@@ -17180,10 +17348,14 @@ public OnPlayerDamage(&playerid, &Float:amount, &issuerid, &weapon, &bodypart)
 	{
 	    return 0;
 	}
+	if(weapon == 9 || weapon == 26) amount *= 0.8;
 	if(CLAN_WAR[CW_ON])
 	{
+	    new bool:doit;
+		if(!CLAN_WAR[CW_WARMUP]) doit = true;
 		if(HasJoined1(playerid))
 		{
+		    if(doit) CW_DAMAGE[playerid] += CW_R_DAMAGE[playerid] += floatround(amount);
 			new maxx = CLAN_WAR[CW_MAX];
 			for(new i=0; i < maxx; i++)
 			{
@@ -17234,6 +17406,7 @@ public OnPlayerDamage(&playerid, &Float:amount, &issuerid, &weapon, &bodypart)
 		}
 		else if(HasJoined2(playerid))
 		{
+		    if(doit) CW_DAMAGE[playerid] += CW_R_DAMAGE[playerid] += floatround(amount);
 			new maxx = CLAN_WAR[CW_MAX];
 			for(new i=0; i < maxx; i++)
 			{
@@ -19487,7 +19660,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 					{
 						if(PlayerInfo[i][Mask] == false)
 						{
-
+							if(HasJoined(i)) continue;
 							if(IsPlayerInRangeOfPoint(i,6.0,Mz[0],Mz[1],Mz[2]))
 							{
 								ApplyAnimation(i,"ped","gas_cwr",4.1,0,1,1,0,4000,1);
@@ -19500,7 +19673,6 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 	}
 	if(PRESSED(KEY_HANDBRAKE))
 	{
-
 		if(Spectating[playerid] == 1) return AdvanceSpectate(playerid);
 		if(InDrone[playerid])
 		{
@@ -26846,7 +27018,7 @@ public StartCWW()
 		GivePlayerWeapon(w,31,250);
 		SetPlayerHealth(w,100);
 		SetPlayerArmour(w,100);
-		GameTextForPlayer(w, "~p~Loading..", 3000, 3);
+		GameTextForPlayer(w, "~n~~n~~p~Loading..", 3000, 3);
 	}
 	foreach(new w: JOINED2)
 	{
@@ -26895,7 +27067,7 @@ public StartCWW()
 		GivePlayerWeapon(w,31,250);
 		SetPlayerHealth(w,100);
 		SetPlayerArmour(w,100);
-		GameTextForPlayer(w, "~p~Loading..", 3000, 3);
+		GameTextForPlayer(w, "~n~~n~~p~Loading..", 3000, 3);
 	}
 	CWTimer3 = SetTimer("InsistOnGoodSpawn", 3000, 0);
 	format(str,sizeof str,"(!) Clan War between [%s] and [%s] is starting in 10 seconds.", cTag[CLAN_WAR[CW_STARTER]],cTag[CLAN_WAR[CW_ACCEPTER]]);
@@ -26961,7 +27133,7 @@ public InsistOnGoodSpawn()
 		GivePlayerWeapon(w,31,250);
 		SetPlayerHealth(w,100);
 		SetPlayerArmour(w,100);
-		GameTextForPlayer(w, "~p~Loading..", 3000, 3);
+		GameTextForPlayer(w, "~n~~n~~p~Loading..", 3000, 3);
 	}
 	foreach(new w: JOINED2)
 	{
@@ -27005,7 +27177,7 @@ public InsistOnGoodSpawn()
 		GivePlayerWeapon(w,31,250);
 		SetPlayerHealth(w,100);
 		SetPlayerArmour(w,100);
-		GameTextForPlayer(w, "~p~Loading..", 3000, 3);
+		GameTextForPlayer(w, "~n~~n~~p~Loading..", 3000, 3);
 	}
 	new w = Iter_Random(JOINED2);
     foreach(new i : Player)
@@ -27427,6 +27599,7 @@ public StartCW2()
 		GivePlayerWeapon(x,31,250);
 		SetPlayerHealth(x,100);
 		SetPlayerArmour(x,100);
+		HideMVP(x);
 	}
 	foreach(new x: JOINED2)
 	{
@@ -27440,6 +27613,7 @@ public StartCW2()
 		GivePlayerWeapon(x,31,250);
 		SetPlayerHealth(x,100);
 		SetPlayerArmour(x,100);
+		HideMVP(x);
 	}
 	foreach(new j: Player)
 	{
@@ -27447,6 +27621,7 @@ public StartCW2()
 	    {
 			PlayerPlaySound(j, 3200, 0,0,0);
 			SpectateNext2(j);
+			HideMVP(j);
 	    }
 	}
 	return 1;
@@ -27847,7 +28022,7 @@ CMD:yes(playerid)
 CMD:duel(playerid,params[])
 {
     if(Iter_Contains(PUBGEvent, playerid)) return ERR(playerid, "Cannot duel in PUBG event.");
-	if(HasJoined(playerid)) return ERR(playerid,"You cant change teams in clan war");
+	if(HasJoined(playerid)) return ERR(playerid,"You cant use this cmd in clan war");
 	new id,wep[30],bet;
 	if(!InArena(playerid, NON)) return SCM(playerid,Dred,"* Cannot usee this cmd in a dm stadium");
 	if(PlayerInfo[playerid][JailTime] > 0) return SCM(playerid,Dred,"* You cannit use this command while in jail!");
@@ -27887,6 +28062,7 @@ CMD:rcduel(playerid,params[])
 {
 	new id,wep[30],bet;
 	if(!InArena(playerid, NON)) return SCM(playerid,Dred,"* Cannot usee this cmd in a dm stadium");
+	if(HasJoined(playerid)) return ERR(playerid,"You cant use this cmd in clan war");
 	if(PlayerInfo[playerid][JailTime] > 0) return SCM(playerid,Dred,"* You cannit use this command while in jail!");
 	if(PlayerInfo[playerid][InDuel] == 1) return SCM(playerid,Dred,"* You are already in Duel");
 	if(PlayerInfo[playerid][Duel_P] != INVALID_PLAYER_ID) return SCM(playerid,Dred,"* You have already invited someone");
@@ -31034,7 +31210,7 @@ CMD:tspecoff(playerid)
 	PlayerTextDrawShow(playerid,Guit[playerid][2]);
 	TextDrawShowForPlayer(playerid, TournamentTD);
 	TextDrawShowForPlayer(playerid, TournamentTD2);
-	
+	HideMVP(playerid);
 	TextDrawShowForPlayer(playerid, QuestTitle);
 	for(new i; i < 3; i++)	if(!Bit_Get(QuestDone[playerid], i)) TextDrawShowForPlayer(playerid, Quest[i]);
 	if(PlayerInfo[playerid][dRank] > 0) if(!Bit_Get(QuestDone[playerid], 3)) TextDrawShowForPlayer(playerid, Quest[3]);
@@ -31074,7 +31250,7 @@ CMD:clanwar(playerid,params[])
 		if(sscanf(params,"dddd",id,maxx,map,rounds)) return USG(playerid,"/Clanwar [clan id] [max members] [MAP (1-2-3)] [Rounds (1-9)] /clans");
 		if(id == x) return ERR(playerid,"oops this is your clan id ..");
 		if(map < 1 || map > 3) return ERR(playerid,"only 3 maps ( 1- de_dust, 2- inferno, 3- RC Battlefied");
-		if(maxx < 3 || maxx > 10) return ERR(playerid,"Minimum members count is 3 and 10 is max");
+		if(maxx < 1 || maxx > 10) return ERR(playerid,"Minimum members count is 3 and 10 is max");
 		if(!(rounds == 1 || rounds == 3 || rounds == 5 || rounds == 7 || rounds == 9)) return ERR(playerid,"Available rounds: 1 | 3 | 5 | 7 | 9");
 		foreach(new i : Player) if(PlayerInfo[i][CWINV] == true) return ERR(playerid,"There is already a clan war request in the server.");
 		if(GetOnLineClanMembers(id) < maxx) {
@@ -31668,6 +31844,7 @@ public toxicbombtiming(playerid,Float:X,Float:Y,Float:Z)
 						{
 							if(PlayerInfo[i][Mask] == false)
 							{
+								if(HasJoined(i)) continue;
 								if(GetPlayerInterior(i) == 0)
 						    	{
 									if (IsPlayerInRangeOfPoint(i, 32.0, X,Y,Z))
@@ -34011,6 +34188,7 @@ CMD:updates(playerid, params[])
 	strcat(Cat,"{FF8080}\nAdded: The Clan Tournament System back (Tested - Flawless).");
 	strcat(Cat,"{FF8080}\nFixed: /st & /sc problems.");
 	strcat(Cat,"{FF8080}\nFixed: DM cmds could be used in class selection.");
+	strcat(Cat,"{FF8080}\nChanged: Decreased chainsaw and sawn off damage by 20 per cent.");
 	if(PlayerInfo[playerid][Level] > 0)
 	{
  		strcat(Cat,"\n\n{0000FF}Admin Notes:");
