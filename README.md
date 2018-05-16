@@ -1,5 +1,5 @@
 # MW3SAMP
-Call of Duty - Modern Warfare 3
+Call of Duty - Modern Warfare 3 - Current Version: 7.7.4
 
 Your contributions to the gamemode and official server are now welcome.
 
