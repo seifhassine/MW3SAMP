@@ -1,45 +1,26 @@
 -- phpMyAdmin SQL Dump
--- version 4.2.12deb2+deb8u2
--- http://www.phpmyadmin.net
+-- version 4.9.4
+-- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: May 16, 2018 at 03:12 PM
--- Server version: 5.5.59-0+deb8u1
--- PHP Version: 5.6.33-0+deb8u1
+-- Generation Time: Mar 05, 2020 at 05:24 AM
+-- Server version: 10.1.44-MariaDB-1~jessie
+-- PHP Version: 7.0.33-1~dotdeb+8.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `stttt`
+-- Database: `server_810_123`
 --
-
-DELIMITER $$
---
--- Procedures
---
-CREATE DEFINER=`root`@`localhost` PROCEDURE `myproc`()
-BEGIN
-DECLARE c INT;
-SET c = 1;
-WHILE c < 1000 DO 
-SELECT CONCAT('Loop #:', c) ;
-
-UPDATE clans set cmembers = (select count(*) from playerbase where inclan = c) where cid = c;
-commit;
-
-SET c=c+1; 
-
-END WHILE;
-END$$
-
-DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -47,11 +28,11 @@ DELIMITER ;
 -- Table structure for table `admins`
 --
 
-CREATE TABLE IF NOT EXISTS `admins` (
-`accid` int(10) NOT NULL,
+CREATE TABLE `admins` (
+  `accid` int(10) NOT NULL,
   `aname` varchar(20) DEFAULT NULL,
   `acountry` varchar(30) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=1319275 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -59,15 +40,15 @@ CREATE TABLE IF NOT EXISTS `admins` (
 -- Table structure for table `bans`
 --
 
-CREATE TABLE IF NOT EXISTS `bans` (
-`bid` int(11) NOT NULL,
+CREATE TABLE `bans` (
+  `bid` int(11) NOT NULL,
   `b_name` varchar(24) DEFAULT NULL,
   `b_ip` varchar(16) DEFAULT NULL,
   `b_admin` varchar(24) DEFAULT NULL,
   `b_reason` varchar(50) DEFAULT NULL,
   `b_time` varchar(30) DEFAULT NULL,
   `expire` int(20) NOT NULL DEFAULT '-1'
-) ENGINE=InnoDB AUTO_INCREMENT=191826 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -75,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `bans` (
 -- Table structure for table `cblacklist`
 --
 
-CREATE TABLE IF NOT EXISTS `cblacklist` (
+CREATE TABLE `cblacklist` (
   `cid` int(20) NOT NULL,
   `pid` int(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -86,12 +67,12 @@ CREATE TABLE IF NOT EXISTS `cblacklist` (
 -- Table structure for table `clanhistory`
 --
 
-CREATE TABLE IF NOT EXISTS `clanhistory` (
-`hid` int(20) NOT NULL,
+CREATE TABLE `clanhistory` (
+  `hid` int(20) NOT NULL,
   `msg` varchar(144) NOT NULL DEFAULT '',
   `cid` int(10) NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB AUTO_INCREMENT=5410 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -99,8 +80,8 @@ CREATE TABLE IF NOT EXISTS `clanhistory` (
 -- Table structure for table `clans`
 --
 
-CREATE TABLE IF NOT EXISTS `clans` (
-`cid` int(20) NOT NULL,
+CREATE TABLE `clans` (
+  `cid` int(20) NOT NULL,
   `ctag` varchar(5) DEFAULT NULL,
   `cname` varchar(20) DEFAULT NULL,
   `cslogan` varchar(70) DEFAULT 'Clan Slogan: None',
@@ -145,22 +126,21 @@ CREATE TABLE IF NOT EXISTS `clans` (
   `ctoy2` int(11) NOT NULL,
   `rank` int(3) NOT NULL DEFAULT '0',
   `rankprog` int(4) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB AUTO_INCREMENT=1757 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Triggers `clans`
 --
-DELIMITER //
-CREATE TRIGGER `OwnerUpdate` BEFORE UPDATE ON `clans`
- FOR EACH ROW BEGIN
+DELIMITER $$
+CREATE TRIGGER `OwnerUpdate` BEFORE UPDATE ON `clans` FOR EACH ROW BEGIN
 
-  /*  IF OLD.cowner IS NOT NULL THEN 
+  /*  IF OLD.cowner IS NOT NULL THEN
     SET NEW.cowner =  (select playerbase.name from playerbase where playerbase.clanown = NEW.cid LIMIT 1);
 END IF;
 */
       SET NEW.cmembers = (select COUNT(id) from playerbase where playerbase.inclan = NEW.cid);
 END
-//
+$$
 DELIMITER ;
 
 -- --------------------------------------------------------
@@ -169,8 +149,8 @@ DELIMITER ;
 -- Table structure for table `clantoys`
 --
 
-CREATE TABLE IF NOT EXISTS `clantoys` (
-`toyid` int(10) NOT NULL,
+CREATE TABLE `clantoys` (
+  `toyid` int(10) NOT NULL,
   `index` int(2) NOT NULL,
   `tbone` int(2) NOT NULL,
   `tx` float NOT NULL,
@@ -183,7 +163,7 @@ CREATE TABLE IF NOT EXISTS `clantoys` (
   `tsy` float NOT NULL,
   `tsz` float NOT NULL,
   `cid` int(8) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -191,25 +171,24 @@ CREATE TABLE IF NOT EXISTS `clantoys` (
 -- Table structure for table `friends`
 --
 
-CREATE TABLE IF NOT EXISTS `friends` (
-`fid` int(20) NOT NULL,
+CREATE TABLE `friends` (
+  `fid` int(20) NOT NULL,
   `alpha` int(20) NOT NULL,
   `beta` int(20) NOT NULL,
   `alphaname` varchar(20) NOT NULL DEFAULT '',
   `betaname` varchar(20) NOT NULL DEFAULT ''
-) ENGINE=InnoDB AUTO_INCREMENT=621 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Triggers `friends`
 --
-DELIMITER //
-CREATE TRIGGER `friend_added` BEFORE INSERT ON `friends`
- FOR EACH ROW BEGIN
+DELIMITER $$
+CREATE TRIGGER `friend_added` BEFORE INSERT ON `friends` FOR EACH ROW BEGIN
 
    SET NEW.alphaname = (select playerbase.name from playerbase where playerbase.id = NEW.alpha);
    SET NEW.betaname = (select playerbase.name from playerbase where playerbase.id = NEW.beta);
 END
-//
+$$
 DELIMITER ;
 
 -- --------------------------------------------------------
@@ -218,14 +197,14 @@ DELIMITER ;
 -- Table structure for table `name_logs`
 --
 
-CREATE TABLE IF NOT EXISTS `name_logs` (
-`id` int(16) NOT NULL,
+CREATE TABLE `name_logs` (
+  `id` int(16) NOT NULL,
   `accountid` int(20) NOT NULL,
   `approvedby` int(24) NOT NULL,
   `new_name` varchar(24) NOT NULL,
   `old_name` varchar(24) NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB AUTO_INCREMENT=5197 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -233,8 +212,8 @@ CREATE TABLE IF NOT EXISTS `name_logs` (
 -- Table structure for table `playerbase`
 --
 
-CREATE TABLE IF NOT EXISTS `playerbase` (
-`id` int(16) NOT NULL,
+CREATE TABLE `playerbase` (
+  `id` int(16) NOT NULL,
   `name` varchar(25) DEFAULT NULL,
   `ip` varchar(16) DEFAULT NULL,
   `pass` varchar(129) DEFAULT NULL,
@@ -286,7 +265,7 @@ CREATE TABLE IF NOT EXISTS `playerbase` (
   `qp` varchar(11) NOT NULL,
   `stm` int(2) NOT NULL DEFAULT '0',
   `pst` varchar(4) NOT NULL DEFAULT '000'
-) ENGINE=InnoDB AUTO_INCREMENT=1657663 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -294,12 +273,12 @@ CREATE TABLE IF NOT EXISTS `playerbase` (
 -- Table structure for table `pubgpickups`
 --
 
-CREATE TABLE IF NOT EXISTS `pubgpickups` (
-`id` int(10) NOT NULL,
+CREATE TABLE `pubgpickups` (
+  `id` int(10) NOT NULL,
   `x` float NOT NULL,
   `y` float NOT NULL,
   `z` float NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=860 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -307,8 +286,8 @@ CREATE TABLE IF NOT EXISTS `pubgpickups` (
 -- Table structure for table `tournament`
 --
 
-CREATE TABLE IF NOT EXISTS `tournament` (
-`TID` int(20) NOT NULL,
+CREATE TABLE `tournament` (
+  `TID` int(20) NOT NULL,
   `WINNER` int(20) NOT NULL DEFAULT '-1',
   `ON` int(2) NOT NULL DEFAULT '1',
   `PHASE` int(10) NOT NULL,
@@ -353,61 +332,62 @@ CREATE TABLE IF NOT EXISTS `tournament` (
 -- Indexes for table `admins`
 --
 ALTER TABLE `admins`
- ADD PRIMARY KEY (`accid`);
+  ADD PRIMARY KEY (`accid`);
 
 --
 -- Indexes for table `bans`
 --
 ALTER TABLE `bans`
- ADD PRIMARY KEY (`bid`);
+  ADD PRIMARY KEY (`bid`);
 
 --
 -- Indexes for table `clanhistory`
 --
 ALTER TABLE `clanhistory`
- ADD PRIMARY KEY (`hid`);
+  ADD PRIMARY KEY (`hid`);
 
 --
 -- Indexes for table `clans`
 --
 ALTER TABLE `clans`
- ADD PRIMARY KEY (`cid`);
+  ADD PRIMARY KEY (`cid`);
 
 --
 -- Indexes for table `clantoys`
 --
 ALTER TABLE `clantoys`
- ADD PRIMARY KEY (`toyid`);
+  ADD PRIMARY KEY (`toyid`);
 
 --
 -- Indexes for table `friends`
 --
 ALTER TABLE `friends`
- ADD PRIMARY KEY (`fid`);
+  ADD PRIMARY KEY (`fid`);
 
 --
 -- Indexes for table `name_logs`
 --
 ALTER TABLE `name_logs`
- ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `accountid_2` (`old_name`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `accountid_2` (`old_name`);
 
 --
 -- Indexes for table `playerbase`
 --
 ALTER TABLE `playerbase`
- ADD UNIQUE KEY `id` (`id`);
+  ADD UNIQUE KEY `id` (`id`);
 
 --
 -- Indexes for table `pubgpickups`
 --
 ALTER TABLE `pubgpickups`
- ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `tournament`
 --
 ALTER TABLE `tournament`
- ADD PRIMARY KEY (`TID`);
+  ADD PRIMARY KEY (`TID`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -417,59 +397,62 @@ ALTER TABLE `tournament`
 -- AUTO_INCREMENT for table `admins`
 --
 ALTER TABLE `admins`
-MODIFY `accid` int(10) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1319275;
+  MODIFY `accid` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1319275;
+
 --
 -- AUTO_INCREMENT for table `bans`
 --
 ALTER TABLE `bans`
-MODIFY `bid` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=191826;
+  MODIFY `bid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=191826;
+
 --
 -- AUTO_INCREMENT for table `clanhistory`
 --
 ALTER TABLE `clanhistory`
-MODIFY `hid` int(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=5410;
+  MODIFY `hid` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5410;
+
 --
 -- AUTO_INCREMENT for table `clans`
 --
 ALTER TABLE `clans`
-MODIFY `cid` int(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1757;
+  MODIFY `cid` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1757;
+
 --
 -- AUTO_INCREMENT for table `clantoys`
 --
 ALTER TABLE `clantoys`
-MODIFY `toyid` int(10) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=64;
+  MODIFY `toyid` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+
 --
 -- AUTO_INCREMENT for table `friends`
 --
 ALTER TABLE `friends`
-MODIFY `fid` int(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=621;
+  MODIFY `fid` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=621;
+
 --
 -- AUTO_INCREMENT for table `name_logs`
 --
 ALTER TABLE `name_logs`
-MODIFY `id` int(16) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=5197;
+  MODIFY `id` int(16) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5197;
+
 --
 -- AUTO_INCREMENT for table `playerbase`
 --
 ALTER TABLE `playerbase`
-MODIFY `id` int(16) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1657663;
+  MODIFY `id` int(16) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1657663;
+
 --
 -- AUTO_INCREMENT for table `pubgpickups`
 --
 ALTER TABLE `pubgpickups`
-MODIFY `id` int(10) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=860;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=860;
+
 --
 -- AUTO_INCREMENT for table `tournament`
 --
 ALTER TABLE `tournament`
-MODIFY `TID` int(20) NOT NULL AUTO_INCREMENT;
-DELIMITER $$
---
--- Events
---
-CREATE DEFINER=`root`@`localhost` EVENT `Quests System` ON SCHEDULE EVERY 1 DAY STARTS '2018-02-28 00:00:00' ENDS '2026-08-26 00:00:00' ON COMPLETION NOT PRESERVE ENABLE COMMENT 'Quests System' DO UPDATE `playerbase` SET `quests`='00000'$$
-
-DELIMITER ;
+  MODIFY `TID` int(20) NOT NULL AUTO_INCREMENT;
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
